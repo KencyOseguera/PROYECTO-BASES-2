@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Seleccionar Tabla</title>
+</head>
+<body>
+    <h1>Seleccionar Tabla</h1>
+    <form action="/seleccionar-tabla" method="post">
+        <label for="tabla">Seleccione una tabla:</label>
+        <select id="tabla" name="tabla">
+            <option value="customers">Customers</option>
+            <option value="employees">Employees</option>
+            <option value="payments">Payments</option>
+        </select>
+        <br>
+        <button type="submit">Mostrar Tabla</button>
+    </form>
+</body>
+</html>
