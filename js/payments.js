@@ -14,12 +14,12 @@ const config = {
     }
 };
 
-async function EmployeesRequest(req, res) {
+async function PaymentsRequest(req, res) {
     try {
         await sql.connect(config);
-        const result = await sql.query`SELECT * FROM Employees`;
+        const result = await sql.query`SELECT * FROM payments`;
         let tableContent = `
-            <h1>Tabla Employees</h1>
+            <h1>Tabla Payments</h1>
             <table>
                 <thead>
                     <tr>
@@ -43,5 +43,5 @@ async function EmployeesRequest(req, res) {
 }
 
 module.exports = {
-    EmployeesRequest
+    PaymentsRequest
 };
