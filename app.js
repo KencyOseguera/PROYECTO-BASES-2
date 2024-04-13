@@ -18,8 +18,41 @@ const config = {
 
 // Crear un servidor HTTP
 const server = http.createServer(async (req, res) => {
-    // Manejar la solicitud para cada tabla
-    if (req.url.startsWith('/customers')) {
+     // Manejar la solicitud para la página principal
+    if (req.url === '/' && req.method === 'GET') {
+        // Leer el archivo HTML de index.html
+        fs.readFile('index.html', 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error al leer el archivo HTML:', err);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Error interno del servidor');
+                return;
+            }
+
+            // Enviar el HTML como respuesta al cliente
+            res.writeHead(200, { 'Content-Type': 'text/html' });
+            res.end(data);
+        });
+    }
+    // Manejar la solicitud para seleccionar la tabla
+    else if (req.url === '/seleccionar-tabla' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', () => {
+            const parsedParams = new URLSearchParams(body);
+            const tabla = parsedParams.get('tabla');
+            // Redirigir al HTML de la tabla seleccionada
+            res.writeHead(302, { 'Location': `/${tabla}` });
+            res.end();
+        });
+    }
+
+    
+    
+    // Manejar la solicitud para cada tabla+++++++
+    else if (req.url.startsWith('/customers')) {
         try {
             // Conectar a SQL Server
             await sql.connect(config);
@@ -92,6 +125,9 @@ const server = http.createServer(async (req, res) => {
         res.end('Página no encontrada');
     }
 });
+
+//PARA LA PAGINA INDEX
+
 
 
 // Escuchar en el puerto 3000
