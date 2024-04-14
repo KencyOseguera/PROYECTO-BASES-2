@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Realizar ETL</title>
+</head>
+<body>
+    <h1>Realizar ETL</h1>
+    <form action="/realizar-etl" method="post">
+        <label for="tablaOrigen">Tabla Origen:</label>
+        <select id="tablaOrigen" name="tablaOrigen">
+            <!-- Opciones para seleccionar la tabla de origen -->
+            <option value="customers">Customers</option>
+            <option value="employees">Employees</option>
+            <!-- Otras opciones -->
+        </select>
+        <br>
+        <label for="tablaDestino">Tabla Destino:</label>
+        <select id="tablaDestino" name="tablaDestino">
+            <!-- Opciones para seleccionar la tabla de destino -->
+            <option value="tabla_destino_1">Tabla Destino 1</option>
+            <option value="tabla_destino_2">Tabla Destino 2</option>
+            <!-- Otras opciones -->
+        </select>
+        <br>
+        <label for="consultaOrigen">Consulta Origen:</label>
+        <textarea id="consultaOrigen" name="consultaOrigen" rows="4" cols="50"></textarea>
+        <br>
+        <label for="camposExtraccion">Campos de Extracción:</label>
+        <input type="text" id="camposExtraccion" name="camposExtraccion" placeholder="Campo1, Campo2, ...">
+        <br>
+        <button type="submit">Realizar ETL</button>
+    </form>
+</body>
+</html>

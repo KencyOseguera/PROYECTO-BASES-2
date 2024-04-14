@@ -78,6 +78,8 @@ const server = http.createServer((req, res) => {
         });
     }
 
+
+    /*PARA EL ETL */
     // Manejar la solicitud para la página de ETL
     else if (req.url === '/etl' && req.method === 'GET') {
         // Leer el archivo HTML de la página de ETL
@@ -95,8 +97,42 @@ const server = http.createServer((req, res) => {
         });
     }
 
+    // Manejar la solicitud para realizar el ETL
+    else if (req.url === '/realizar-etl' && req.method === 'POST') {
+        let body = '';
+        req.on('data', chunk => {
+            body += chunk.toString();
+        });
+        req.on('end', async () => {
+            const { tablaOrigen, tablaDestino, consultaOrigen, camposExtraccion } = new URLSearchParams(body);
 
-    // Manejar la solicitud para el archivo CSS
+            try {
+                // Conectar a SQL Server
+                await sql.connect(config);
+
+                // Ejecutar la consulta de origen o la consulta indicada
+                const query = consultaOrigen ? consultaOrigen : `SELECT ${camposExtraccion} FROM ${tablaOrigen}`;
+                const result = await sql.query(query);
+
+                // Procesar los datos y cargarlos en la tabla destino
+                // Aquí implementa la lógica para la transformación y carga de datos
+
+                // Enviar mensaje de éxito al cliente
+                res.writeHead(200, { 'Content-Type': 'text/plain' });
+                res.end('Proceso ETL completado con éxito');
+            } catch (error) {
+                console.error('Error al conectar a SQL Server o ejecutar la consulta:', error);
+                res.writeHead(500, { 'Content-Type': 'text/plain' });
+                res.end('Error interno del servidor');
+            } finally {
+                sql.close();
+            }
+        });
+    }
+
+    /*FIN ETL */
+
+    // Solicitud para el archivo CSS
     else if (req.url.endsWith('.css') && req.method === 'GET') {
         const cssPath = path.join(__dirname, req.url);
         serveStaticFile(cssPath, 'text/css');
