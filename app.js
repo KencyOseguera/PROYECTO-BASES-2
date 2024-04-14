@@ -80,7 +80,7 @@ const server = http.createServer((req, res) => {
 
 
     /*PARA EL ETL */
-    // Manejar la solicitud para la página de ETL
+    // Solicitud para la página de ETL mostrarla
     else if (req.url === '/etl' && req.method === 'GET') {
         // Leer el archivo HTML de la página de ETL
         fs.readFile('etl.html', 'utf8', (err, data) => {
