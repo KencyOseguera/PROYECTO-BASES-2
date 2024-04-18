@@ -2,34 +2,39 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Realizar ETL</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ETL OLAP</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <h1>Realizar ETL</h1>
-    <form action="/realizar-etl" method="post">
-        <label for="tablaOrigen">Tabla Origen:</label>
-        <select id="tablaOrigen" name="tablaOrigen">
-            <!-- Opciones para seleccionar la tabla de origen -->
-            <option value="customers">Customers</option>
-            <option value="employees">Employees</option>
-            
-        </select>
-        <br>
-        <label for="tablaDestino">Tabla Destino:</label>
-        <select id="tablaDestino" name="tablaDestino">
-            <!-- Opciones para seleccionar la tabla de destino -->
-            <option value="tabla_destino_1">Tabla Destino 1</option>
-            <option value="tabla_destino_2">Tabla Destino 2</option>
-            
-        </select>
-        <br>
-        <label for="consultaOrigen">Consulta Origen:</label>
-        <textarea id="consultaOrigen" name="consultaOrigen" rows="4" cols="50"></textarea>
-        <br>
-        <label for="camposExtraccion">Campos de Extracción:</label>
-        <input type="text" id="camposExtraccion" name="camposExtraccion" placeholder="Campo1, Campo2, ...">
-        <br>
-        <button type="submit">Realizar ETL</button>
-    </form>
+    <div class="container">
+        <h1 class="mt-5 mb-4">Proceso ETL OLAP</h1>
+        <form action="/realizar-etl-olap" method="post">
+            <div class="form-group">
+                <label for="tablaOrigen">Tabla de Origen (OLTP):</label>
+                <select class="form-control" id="tablaOrigen" name="tablaOrigen">
+                    <option value="customers">Customers</option>
+                    <option value="employees">Employees</option>
+                    <!-- Agrega más opciones según tus tablas de OLTP -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="tablaDestino">Tabla de Destino (OLAP):</label>
+                <select class="form-control" id="tablaDestino" name="tablaDestino">
+                    <option value="dim_customers">Dim_Customers</option>
+                    <option value="dim_employees">Dim_Employees</option>
+                    <!-- Agrega más opciones según tus tablas de OLAP -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="consulta">Consulta SQL:</label>
+                <textarea class="form-control" id="consulta" name="consulta" rows="5" placeholder="Ingrese la consulta SQL para extraer los datos"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Realizar ETL</button>
+        </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
