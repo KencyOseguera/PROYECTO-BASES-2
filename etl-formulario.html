@@ -1,0 +1,30 @@
+<!-- etl-form.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Selección de Tablas para ETL</title>
+</head>
+<body>
+    <h1>Selección de Tablas para ETL</h1>
+    <form id="etlForm">
+        <label for="tablaOrigen">Tabla de Origen:</label>
+        <select id="tablaOrigen" name="tablaOrigen">
+            <option value="customers">Customers</option>
+            <option value="employees">Employees</option>
+            <!-- Otras tablas de origen -->
+        </select>
+
+        <label for="tablaDestino">Tabla de Destino:</label>
+        <select id="tablaDestino" name="tablaDestino">
+            <option value="CUSTOMERS">CUSTOMERS</option>
+            <option value="EMPLOYEES">EMPLOYEES</option>
+            <!-- Otras tablas de destino -->
+        </select>
+
+        <button type="submit">Realizar ETL</button>
+    </form>
+
+    <script src="./js/etl-script.js"></script>
+</body>
+</html>
