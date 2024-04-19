@@ -1,23 +1,25 @@
 // Configuración de conexión para OLTP
-const configOLTP = {
-    user: 'usuarioOLTP',
-    password: 'contraseñaOLTP',
+/*const configOLTP = {
+    user: 'admin',
+    password: 'administrador',
     server: 'localhost',
-    database: 'nombreOLTP',
+    port: 1433, 
+    database: 'ClassicModels',
     options: {
-        encrypt: true,
+        encrypt: false,
         trustServerCertificate: true
     }
 };
 
 // Configuración de conexión para OLAP
 const configOLAP = {
-    user: 'usuarioOLAP',
-    password: 'contraseñaOLAP',
+    user: 'admin',
+    password: 'administrador',
+    port: 1433, 
     server: 'localhost',
-    database: 'nombreOLAP',
+    database: 'OLAP_CLASSICMODELS',
     options: {
-        encrypt: true,
+        encrypt: false,
         trustServerCertificate: true
     }
 };
@@ -26,3 +28,4 @@ module.exports = {
     configOLTP,
     configOLAP
 };
+*/
