@@ -161,41 +161,6 @@ const server = http.createServer((req, res) => {
     }
 });
 
-app.post('/realizar-etl', async (req, res) => {
-    const { tablaOrigen, tablaDestino } = req.body;
-
-    try {
-        await sql.connect(config);
-
-        let query = '';
-
-        if (tablaDestino === 'CUSTOMERS') {
-            query = `
-                INSERT INTO CUSTOMERS (CUSTOMERNUMBER, CUSTOMERNAME, NOMBRE_CONTACTO_CUSTOMER, CITY, COUNTRY)
-                SELECT CUSTOMERNUMBER, customerName, CONCAT(contactFirstName, ' ', contactLastName) AS NOMBRE_CONTACTO_CUSTOMER, city, country
-                FROM ClassicModels.dbo.customers;
-            `;
-        } else if (tablaDestino === 'EMPLOYEES') {
-            query = `
-                INSERT INTO EMPLOYEES (EMPLOYEENUMBER, NOMBRE_EMPLOYEE, OFFICECODE)
-                SELECT employeeNumber, CONCAT(firstName, ' ', lastName) AS NOMBRE_EMPLOYEE, officeCode
-                FROM ClassicModels.dbo.employees;
-            `;
-        }
-
-        await sql.query(query);
-        console.log(`Tabla ${tablaDestino} en OLAP llenada correctamente.`);
-        res.sendStatus(200);
-    } catch (error) {
-        console.error(`Error al llenar la tabla ${tablaDestino} en OLAP:`, error);
-        res.sendStatus(500);
-    } finally {
-        await sql.close();
-    }
-});
-
-
-
 const PORT = 3000;
 server.listen(PORT, () => {
     console.log(`Servidor en funcionamiento en http://localhost:${PORT}/`);

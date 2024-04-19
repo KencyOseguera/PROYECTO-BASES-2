@@ -1,0 +1,54 @@
+const { sql, configOLTP, configOLAP } = require('./db'); // Configuraciones para OLTP y OLAP
+
+async function extraerDatosOLTP() {
+    try {
+        // Conectar a la base de datos OLTP
+        await sql.connect(configOLTP);
+
+        // Consulta SQL para extraer datos de la tabla CUSTOMERS en OLTP
+        const query = `
+            SELECT CUSTOMERNUMBER, customerName, contactFirstName, contactLastName, city, country
+            FROM ClassicModels.dbo.customers;
+        `;
+
+        // Ejecutar la consulta SQL y obtener los datos
+        const result = await sql.query(query);
+        return result.recordset; // Retornar los datos extraídos
+    } catch (error) {
+        console.error('Error al extraer datos de la OLTP:', error);
+        throw error; // Lanzar el error para manejarlo externamente
+    } finally {
+        await sql.close(); // Cerrar la conexión a la base de datos OLTP
+    }
+}
+
+async function llenarTablaCustomersOLAP() {
+    try {
+        // Extraer los datos de la OLTP
+        const datosOLTP = await extraerDatosOLTP();
+
+        // Conectar a la base de datos OLAP
+        await sql.connect(configOLAP);
+
+        // Consulta SQL para llenar la tabla CUSTOMERS en OLAP con los datos extraídos
+        const query = `
+            INSERT INTO CUSTOMERS (CUSTOMERNUMBER, CUSTOMERNAME, NOMBRE_CONTACTO_CUSTOMER, CITY, COUNTRY)
+            VALUES (@CUSTOMERNUMBER, @CUSTOMERNAME, @NOMBRE_CONTACTO_CUSTOMER, @CITY, @COUNTRY);
+        `;
+
+        // Preparar la consulta parametrizada para insertar datos en OLAP
+        const preparedQuery = await sql.prepare(query);
+        datosOLTP.forEach(async (row) => {
+            await preparedQuery.execute(row); // Insertar cada fila en la tabla OLAP
+        });
+
+        console.log('Tabla CUSTOMERS en OLAP llenada correctamente.');
+    } catch (error) {
+        console.error('Error al llenar la tabla CUSTOMERS en OLAP:', error);
+    } finally {
+        await sql.close(); // Cerrar la conexión a la base de datos OLAP
+    }
+}
+
+// Ejemplo de llamada a la función para llenar la tabla CUSTOMERS en OLAP
+llenarTablaCustomersOLAP();
