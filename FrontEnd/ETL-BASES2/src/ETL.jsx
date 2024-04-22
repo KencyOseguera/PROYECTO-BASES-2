@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import axios from 'axios';
 
@@ -9,11 +10,11 @@ const ETLForm = () => {
     const [camposSeleccionados, setCamposSeleccionados] = useState([]);
     const [camposSeleccionadosDestino, setCamposSeleccionadosDestino] = useState([]);
     const [transformacionesPorCampo, setTransformacionesPorCampo] = useState({});
-    const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
     const [datosTransformados, setDatosTransformados] = useState([]); // Nuevo estado para datos transformados
-    const [camposConcatenar, setCamposConcatenar] = useState([]);
     const [datosCargados, setDatosCargados] = useState([]);
+    const [tablaDestinoBorrar, setTablaDestinoBorrar] = useState('');
+    const [errorBorrar, setErrorBorrar] = useState('');
 
 
     const camposDisponiblesOrigen = {
@@ -63,7 +64,28 @@ const ETLForm = () => {
         setCamposSeleccionadosDestino(selectedFields);
     };
 
+    const handleBorrarDatos = async (event) => {
+        event.preventDefault();
+        setErrorBorrar('');
 
+        if (!tablaDestinoBorrar) { // Verificar que se haya seleccionado una tabla de destino para borrar
+            setErrorBorrar('Debe seleccionar una tabla de destino para borrar datos.');
+            return;
+        }
+
+        try {
+            const responseBorrar = await axios.post('http://localhost:3000/api/borrarDatosOLAP', {
+                tablaDestino: tablaDestinoBorrar,
+            });
+
+            console.log('Respuesta de borrado de datos:', responseBorrar.data); // Agregado para depuración
+            alert('Datos borrados en la tabla de destino OLAP correctamente.');
+
+        } catch (error) {
+            setErrorBorrar('Error al ejecutar el proceso de borrado: ' + error.message);
+            alert('No se pudo completar el borrado de datos en la tabla de destino OLAP.');
+        }
+    };
   
   
     const handleExtraerYTransformar = async (event) => {
@@ -80,6 +102,7 @@ const ETLForm = () => {
             console.log('Respuesta de extracción y transformación de datos:', response.data); // Agregado para depuración
 
             // Actualizar los datos transformados en el estado
+            alert('Extraccion y transformacion de datos exitoso.');
             setDatosTransformados(response.data.datosTransformados);
         } catch (error) {
             setError('Error al ejecutar el proceso de extracción y transformación: ' + error.message);
@@ -87,70 +110,6 @@ const ETLForm = () => {
         }
     };
 
-/*
-    const handleExtraerYTransformar = async (event) => {
-        event.preventDefault();
-        setError('');
-    
-        try {
-            let camposConcatenados = {};
-            camposConcatenar.forEach((campo) => {
-                const valorCampo = datosTransformados.map((dato) => dato[campo]).join(' '); // Concatenar usando un espacio
-                camposConcatenados[campo] = valorCampo;
-            });
-    
-            // Agregar campos concatenados a datosTransformados si es necesario
-            if (Object.keys(camposConcatenados).length > 0) {
-                setDatosTransformados((prevData) => prevData.map((dato) => ({ ...dato, ...camposConcatenados })));
-            }
-    
-            const response = await axios.post('http://localhost:3000/api/extraerYTransformarDatos', {
-                tablaOrigen,
-                camposSeleccionados,
-                transformacionesPorCampo,
-            });
-    
-            console.log('Respuesta de extracción y transformación de datos:', response.data); // Agregado para depuración
-    
-            // Actualizar los datos transformados en el estado
-            setDatosTransformados(response.data.datosTransformados);
-        } catch (error) {
-            setError('Error al ejecutar el proceso de extracción y transformación: ' + error.message);
-            console.error('Detalles del error:', error); // Agrega este registro para obtener más detalles del error
-        }
-    };
-    
-*/
-/*
-const handleExtraerYTransformar = async (event) => {
-    event.preventDefault();
-    setError('');
-
-    try {
-        const response = await axios.post('http://localhost:3000/api/extraerYTransformarDatos', {
-            tablaOrigen,
-            camposSeleccionados,
-            transformacionesPorCampo,
-        });
-
-        console.log('Respuesta de extracción y transformación de datos:', response.data);
-
-        // Concatenar campos seleccionados en el origen si es necesario
-        const datosTransformadosActualizados = response.data.datosTransformados.map((dato) => {
-            const camposConcatenados = {};
-            camposConcatenar.forEach((campo) => {
-                camposConcatenados[campo] = dato[campo];
-            });
-            return { ...dato, ...camposConcatenados };
-        });
-
-        setDatosTransformados(datosTransformadosActualizados);
-    } catch (error) {
-        setError('Error al ejecutar el proceso de extracción y transformación: ' + error.message);
-        console.error('Detalles del error:', error);
-    }
-};
-*/
 
 const handleCargar = async (event) => {
     event.preventDefault();
@@ -173,33 +132,9 @@ const handleCargar = async (event) => {
 
     } catch (error) {
         setError('Error al ejecutar el proceso de carga: ' + error.message);
-        lert('No se pudo completar el ETL');
+        alert('No se pudo completar el ETL');
     }
 };
-
-/*
-    const handleCargar = async (event) => {
-        event.preventDefault();
-        setError('');
-    
-        if (!tablaDestino || !datosTransformados.length || !camposSeleccionadosDestino.length) { // Verificar datos transformados y campos de destino
-            setError('Debe seleccionar una tabla de destino, proporcionar datos transformados válidos y seleccionar campos de destino.');
-            return;
-        }
-    
-        try {
-            const responseCargar = await axios.post('http://localhost:3000/api/cargarDatosOLAP', {
-                tablaDestino,
-                camposInsertar: camposSeleccionadosDestino, // Cambiar a camposInsertar
-                datosTransformados,
-            });
-    
-            console.log('Respuesta de carga de datos:', responseCargar.data); // Agregado para depuración
-        } catch (error) {
-            setError('Error al ejecutar el proceso de carga: ' + error.message);
-        }
-    };
-    */
 
     return (
         <div>
@@ -275,10 +210,6 @@ const handleCargar = async (event) => {
                                     <option value="">Selecciona una transformación</option>
                                     <option value="minusculas">Convertir a minúsculas</option>
                                     <option value="mayusculas">Convertir a mayúsculas</option>
-                                    <option value="concatenar">Concatenar</option>
-                                    <option value="mes">Obtener Mes</option>
-                                    <option value="ano">Obtener Año</option>
-                                    <option value="dia">Obtener Dias</option>
                                     {/* Otros tipos de transformación */}
                                 </select>
                             </div>
@@ -289,6 +220,7 @@ const handleCargar = async (event) => {
                     <button onClick={handleExtraerYTransformar}>Extraer y Transformar</button>
                     
                     <button onClick={handleCargar}>Cargar en OLAP</button>
+                    <button onClick={handleBorrarDatos}>Borrar en OLAP</button>
 
                     
                     {/* Mostrar datos cargados en la tabla */}

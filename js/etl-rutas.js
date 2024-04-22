@@ -6,11 +6,22 @@ const {
     ejecutarConsultaSQL, extraerDatos, 
     concatenarValores, obtenerParteFechaHora,
     convertirAMayuscula,convertirAMinuscula,
-    identificarRegistrosNuevosActualizados,
     cargarDatosOLAP,
-    ejecutarTransformacion,
-    transformarDatos
+    BorrarDatos,
+    transformarDatos,
+    CargarHechos
 } = require('./llenado-elt'); // Importar las funciones del controlador
+
+
+router.post('/llenarTablaHechos', async (req, res) => {
+    try {
+        const nombreProcedimiento = 'LlenarTablaOLAPHechos';
+        const resultado = await controller.ejecutarProcedimientoAlmacenado(nombreProcedimiento);
+        res.status(200).json({ message: 'Procedimiento ejecutado correctamente', resultado });
+    } catch (error) {
+        res.status(500).json({ message: 'Error al ejecutar el procedimiento almacenado', error: error.message });
+    }
+});
 
 
 // ruta para extraer datos de origen
@@ -21,6 +32,17 @@ router.post('/extraerDatos', async (req, res) => {
         res.json({ datos: datosExtraidos });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+router.post('/borrarDatosOLAP', async (req, res) => {
+    const { tablaDestino } = req.body; // Obtén el nombre de la tabla de destino desde la solicitud
+
+    try {
+        const resultadoBorrar = await BorrarDatos(tablaDestino); // Llama a la función BorrarDatos con el nombre de la tabla de destino
+        res.json({ resultadoBorrar }); // Devuelve el resultado de la operación de borrado
+    } catch (error) {
+        res.status(500).json({ error: 'Error al borrar datos en la tabla de destino OLAP.', message: error.message });
     }
 });
 
@@ -133,178 +155,19 @@ router.post('/extraerYTransformarDatos', async (req, res) => {
     }
 });
 
-/*
-const concatenarValor = (campo, valorAConcatenar) => {
-    return campo + valorAConcatenar;
-  };
-  
-  // Función para obtener parte de una fecha
-  const obtenerParteFecha = (fecha, parte) => {
-    const date = new Date(fecha);
-    switch (parte) {
-      case 'mes':
-        return date.getMonth() + 1; // Sumar 1 porque los meses van de 0 a 11 en JavaScript
-      case 'ano':
-        return date.getFullYear();
-      case 'dia':
-        return date.getDate();
-      case 'semana':
-        // Obtener el número de semana del año
-        const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
-        const pastDaysOfYear = (date - firstDayOfYear) / 86400000; // 86400000 = 24 horas * 60 minutos * 60 segundos * 1000 milisegundos
-        return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
-      default:
-        throw new Error('Parte de fecha no válida');
-    }
-  };
-  
-  // Definir la ruta para procesar las transformaciones de campos
-  router.post('/transformarCampos', (req, res) => {
-    // Obtener las transformaciones enviadas desde el cliente
-    const { transformaciones } = req.body;
-  
-    try {
-      // Aquí puedes implementar la lógica para procesar cada transformación
-      const resultadosTransformaciones = transformaciones.map(({ campo, tipoTransformacion, valorConcatenar, parteFecha }) => {
-        // Implementar la lógica de transformación para cada tipo
-        switch (tipoTransformacion) {
-          case 'minusculas':
-            return { campo, resultado: campo.toLowerCase() };
-          case 'mayusculas':
-            return { campo, resultado: campo.toUpperCase() };
-          case 'concatenar':
-            return { campo, resultado: concatenarValor(campo, valorConcatenar) };
-          case 'obtenerfecha':
-            return { campo, resultado: obtenerParteFecha(campo, parteFecha) };
-          default:
-            throw new Error(`Tipo de transformación no válido para el campo ${campo}`);
-        }
-      });
-  
-      // Devolver los resultados de las transformaciones al cliente
-      res.json({ resultadosTransformaciones });
-    } catch (error) {
-      // En caso de error, devolver un mensaje de error al cliente
-      res.status(500).json({ error: error.message });
-    }
-  });
-
-
-
-/*
-router.post('/ejecutarProcedimiento', async (req, res) => {  // Usa la misma ruta en el backend
-    const datos = req.body;
-    try {
-        await llenarTablaOLAP(datos.tablaDestino, datos.campos, datos.camposDestino);  // Ajusta la llamada según tus parámetros
-        res.json({ message: 'Procedimiento ejecutado correctamente' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al ejecutar el procedimiento almacenado', error: error.message });
-    }
-});
-
-// Ruta para llenar la tabla CUSTOMERS en OLAP
-router.post('/llenarTablaOLAP', async (req, res) => {
-    const datos = req.body;
-    try {
-        await llenarTablaCustomersOLAP(datos);
-        res.json({ message: 'Tabla CUSTOMERS en OLAP llenada correctamente.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al llenar la tabla CUSTOMERS en OLAP', error: error.message });
-    }
-});
-
-
-router.post('/llenarTablaTiempo', async (req, res) => {
-    const { campos, operaciones } = req.body;
-
-    try {
-        if (!campos || !operaciones) {
-            return res.status(400).json({ error: 'Falta información necesaria para ejecutar el procedimiento.' });
-        }
-
-        await llenarTablaTiempoOlAP(campos, operaciones);
-        return res.status(200).json({ message: 'Procedimiento de llenado de tabla tiempo ejecutado correctamente.' });
-    } catch (error) {
-        console.error('Error al ejecutar el procedimiento de llenado de tabla tiempo:', error);
-        return res.status(500).json({ error: 'Error al ejecutar el procedimiento de llenado de tabla tiempo.' });
-    }
-});
-
-
-router.get('/obtenertabla/:tabla', async (req, res) => {
-    const { tabla } = req.params; // Obtiene el nombre de la tabla desde la URL
-
-    try {
-        // Llama a la función obtenerDatosTablaOLAP con el nombre de la tabla como parámetro
-        const datosTablaOLAP = await obtenerDatosTablaOLAP(tabla);
-        res.status(200).json(datosTablaOLAP);
-    } catch (error) {
-        console.error(`Error al obtener los datos de la tabla ${tabla} en OLAP:`, error);
-        res.status(500).json({ message: `Error al obtener los datos de la tabla ${tabla} en OLAP`, error: error.message });
-    }
-});
-
-
-/*
-// Ruta para llenar la tabla EMPLOYEES en OLAP
-router.post('/llenarTablaOLAPEMP', async (req, res) => {
-    const datos = req.body;
-    try {
-        await llenarEmployeesOLAP(datos);
-        res.json({ message: 'Tabla CUSTOMERS en OLAP llenada correctamente.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al llenar la tabla CUSTOMERS en OLAP', error: error.message });
-    }
-});
-
-
-// Ruta para llenar la tabla products en OLAP
-router.post('/llenarTablaOLAPPrd', async (req, res) => {
-    const datos = req.body;
-    try {
-        await llenarProductsOLAP(datos);
-        res.json({ message: 'Tabla Products en OLAP llenada correctamente.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al llenar la tabla CUSTOMERS en OLAP', error: error.message });
-    }
-});
-
-
-// Ruta para llenar la tabla productline en OLAP
-router.post('/llenarTablaOLAPPrd', async (req, res) => {
-    const datos = req.body;
-    try {
-        await llenarProductsLineOLAP(datos);
-        res.json({ message: 'Tabla Products en OLAP llenada correctamente.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al llenar la tabla CUSTOMERS en OLAP', error: error.message });
-    }
-});
-
-// Ruta para llenar la tabla productline en OLAP
-router.post('/llenarTablaOLATiempo', async (req, res) => {
-    const datos = req.body;
-    try {
-        await llenarTiempoOLAP(datos);
-        res.json({ message: 'Tabla Products en OLAP llenada correctamente.' });
-    } catch (error) {
-        res.status(500).json({ message: 'Error al llenar la tabla CUSTOMERS en OLAP', error: error.message });
-    }
-});
 
 // Ruta para obtener los datos de la tabla productline en OLAP
-router.get('/obtenertabla/:tabla', async (req, res) => {
-    const { tabla } = req.params; // Obtiene el nombre de la tabla desde la URL
-
+router.get('/obtenertablaHechos', async (req, res) => {
+    
     try {
         // Llama a la función obtenerDatosTablaOLAP con el nombre de la tabla como parámetro
-        const datosTablaOLAP = await obtenerDatosTablaOLAP(tabla);
+        const datosTablaOLAP = await CargarHechos();
         res.status(200).json(datosTablaOLAP);
     } catch (error) {
         console.error(`Error al obtener los datos de la tabla ${tabla} en OLAP:`, error);
         res.status(500).json({ message: `Error al obtener los datos de la tabla ${tabla} en OLAP`, error: error.message });
     }
 });
-*/
+
 
 module.exports = router;
