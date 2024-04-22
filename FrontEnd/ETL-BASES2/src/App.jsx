@@ -5,6 +5,9 @@ import './App.css'
 import LlenadoCustommers from './LlenadoCustommers';
 import LlenadoEmployees from './LlenadoEmployees';
 import Inicio from './Inicio';
+import LlenadoProducts from './LlenadoProducts';
+import ETLForm from './ETL';
+
 function App() {
   
 
@@ -12,8 +15,10 @@ function App() {
     <Router>
     <Routes>
       <Route path="/" element={<Inicio />} />
+      <Route path="/etl" element={<ETLForm />} />
       <Route path="/Customers" element={<LlenadoCustommers />} />
       <Route path="/Employees" element={<LlenadoEmployees />} />
+      <Route path="/LlenadoProducts" element={<LlenadoProducts />} />
     </Routes>
   </Router>
   )

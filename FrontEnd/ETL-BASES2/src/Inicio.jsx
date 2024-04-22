@@ -11,7 +11,7 @@ const Inicio = () => {
             <div>
                 <Link to="/Customers"><button>Llenado CUSTOMERS</button></Link>
                 <Link to="/Employees"><button>Llenado EMPLOYEES</button></Link>
-                <Link to="/ruta3"><button>Llenado PRODUCTS</button></Link>
+                <Link to="/LlenadoProducts"><button>Llenado PRODUCTS</button></Link>
                 <Link to="/ruta4"><button>Llenado TIMEPO</button></Link>
                 <Link to="/ruta5"><button>Llenado PRODUCTI LINE</button></Link>
                 <Link to="/ruta6"><button>Llenado HECHOS</button></Link>
